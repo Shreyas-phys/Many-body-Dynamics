@@ -1,4 +1,4 @@
-Here is a detailed documentation of the `ShieldRK-Original.c` file in markdown format. The documentation includes explanations of the code and relevant code snippets.
+Here is a detailed documentation of the `ShieldRK-Original.c` file.
 
 ---
 
@@ -93,12 +93,123 @@ The program initializes global variables and simulation parameters, such as the 
 ```c
 ns = 10;  // Number of spins
 n = 1 << ns;  // Matrix dimension, 2^ns
-double B = 0.5;  // Magnetic field in z direction
-double J = 2.0;  // Nearest-neighbor interaction in x direction
+double B = 0; //magnetic field in z direction
+//double B = (double)varyVariable/2;
+double W = 0.0; // disorder strength
+double J = 0; //NN interaction in x
+//double J = (double)varyVariable / 10;
+//double Jlong = 0; //long range in x direction
+double Jlong = (double)varyVariable / 30;
+//double Jz = (double)varyVariable / 10; //NN interaction in z
+double Jz = 1;
+double alpha = 20.0; //short range interaction in x
+double alphalong = 0.0; //long range interaction in x
+//double alphalong = (double)varyVariable/10;
+```
+#### 1.2 Kac Rescaling  
+This section rescales Jlong using the exact Kac prescription
+```c
+sumVlong = 0; // rescale Jlong using exact Kac prescription 
+				for (k = 0; k < ns; k++) for (kp = 0; kp < k; kp++)
+					sumVlong += 1 / pow(k - kp, alphalong);
+				Jlong = Jlong * ns / sumVlong;
+				//Jlong = 1;
+				//check
+				double sumVlongcheck = sumVlong;
+				printf("Kac Jlong %lf %lf %lf \n", sumVlongcheck, Jlong, Jlong * pow(ns, 1 - alphalong));
 ```
 
 #### 2. Hamiltonian Construction
 The Hamiltonian is constructed by iterating over all spin configurations. Sparse matrix representation is used for efficiency.
+
+##### 2.1 Zeeman Term Construction in the X Basis
+
+The following code constructs the **Zeeman term** of a quantum spin Hamiltonian in the **(X) basis**:
+
+```cpp
+for (i = 0; i < n; i++) {
+    spins(i, list1);      // Get spin configuration for basis state i
+    spins(i, list2);      // Copy to list2 for manipulation
+    for (k = 0; k < ns; k++) {
+        list2[k] = 1 - list2[k];      // Flip spin at site k
+        j = ind(list2);              // Get index of new basis state
+        ham2[nham] = h[k];           // Field strength at site k
+        hind1[nham] = i;             // Row index
+        hind2[nham] = j;             // Column index
+        nham++;
+        list2[k] = 1 - list2[k];     // Revert spin flip
+    }
+}
+```
+Explanation
+n: Number of basis states (e.g., $2^ns$  for ns spins).
+
+spins(i, list): Converts basis index i to a binary spin configuration.
+
+list2[k] = 1 - list2[k]: Flips the k-th spin.
+
+ind(list2): Computes the index j of the new basis state after the flip.
+
+(i, j) with value h[k] is added to the sparse Hamiltonian arrays ham2, hind1, hind2.
+
+
+##### 🔗 Nearest-Neighbor Interaction – $\sigma^x_k \sigma^x_{k+1}$ Term
+
+This code builds a **nearest-neighbor spin-flip interaction** term of the form:
+
+$$
+H = \sum_{k=0}^{ns-2} J \, \sigma^x_k \sigma^x_{k+1}
+$$
+
+##### Loop over basis states
+
+```cpp
+for (i = 0; i < n; i++) {
+```
+
+* Loop through all basis states `|i⟩`.
+
+##### Get spin configuration
+
+```cpp
+spins(i, list1);
+```
+
+* Convert index `i` into spin configuration array `list1`.
+
+##### Loop over neighboring spin pairs
+
+```cpp
+for (k = 0; k < ns - 1; k++) {
+```
+
+* Loop over nearest-neighbor spin sites.
+
+##### Flip spins at sites $k$ and $k+1$
+
+```cpp
+list2[k] = 1 - list2[k];
+list2[k + 1] = 1 - list2[k + 1];
+j = ind(list2);
+```
+
+* Apply $\sigma^x_k \sigma^x_{k+1}$: flip two spins and get new state index `j`.
+
+##### Store matrix element
+
+```cpp
+ham2[nham] = J;
+hind1[nham] = i;
+hind2[nham] = j;
+nham++;
+```
+
+* Store off-diagonal Hamiltonian element:
+  $\langle i | J \, \sigma^x_k \sigma^x_{k+1} | j \rangle$
+
+This builds the **spin-exchange interaction** in the x-basis, connecting states differing by two neighboring flipped spins—typical in Ising or transverse-field models.
+
+Summary
 
 ```c
 for (i = 0; i < n; i++) {
