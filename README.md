@@ -297,6 +297,31 @@ This function uses temporary vectors (`t1`, `t2`, `k1`, etc.) to calculate inter
 ---
 
 ## Sparse and Dense Matrix Operations
+The Hamiltonian matrix is represented in a sparse format using the following arrays:
+•	ham2: Stores the non-zero values of the Hamiltonian matrix.
+•	hind1: Stores the row indices corresponding to the non-zero elements in ham2.
+•	hind2: Stores the column indices corresponding to the non-zero elements in ham2.
+This format allows efficient storage and operations on the Hamiltonian matrix by focusing only on the non-zero elements.
+---
+
+The sparse matrix is constructed in the following part of the code:
+```c
+ham2 = ARR_D(nham); // Allocate memory for non-zero values
+hind1 = ARR_I(nham); // Allocate memory for row indices
+hind2 = ARR_I(nham); // Allocate memory for column indices
+nham = 0; // Initialize the count of non-zero elements
+
+```
+Non-zero elements are added to the sparse matrix during the loop over basis states:
+```c
+ham2[nham] = sumV + sumVlong; // Store the value of the non-zero element
+hind1[nham] = i; // Store the row index
+hind2[nham] = i; // Store the column index
+nham++; // Increment the count of non-zero elements
+
+```
+This ensures that only the non-zero elements of the Hamiltonian are stored, significantly reducing memory usage.
+---
 
 The file provides two functions for matrix-vector multiplication:
 - `Hpsi` for dense matrices.
