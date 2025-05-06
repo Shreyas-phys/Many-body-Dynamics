@@ -222,8 +222,9 @@ for (i = 0; i < n; i++) {
     }
 }
 ```
-
-#### 3. Time Evolution
+---
+## Functions
+### Time Evolution
 Time evolution is performed using the Runge-Kutta 4th order method (`rk` function).
 
 ```c
