@@ -297,6 +297,7 @@ This function uses temporary vectors (`t1`, `t2`, `k1`, etc.) to calculate inter
 ---
 
 ## Sparse and Dense Matrix Operations
+
 The Hamiltonian matrix is represented in a sparse format using the following arrays:
 •	ham2: Stores the non-zero values of the Hamiltonian matrix.
 •	hind1: Stores the row indices corresponding to the non-zero elements in ham2.
