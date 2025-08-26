@@ -140,7 +140,18 @@ int main()
 	//eigenvalue matches Mathematica
 	printf("%s\n", "-----------------EIGENVALUES En------------------");
 	for (i=0;i<n;i++) printf("%lf\n",eval[i]);
+	
+	printf("%s\n", "-----------------EIGENVALUES En------------------");
+	for (i=0;i<n;i++) printf("%lf\n",eval[i]);
 
+	// Save eigenvalues to file
+	FILE* fh_eigen;
+	fh_eigen = fopen("D:\\OneDrive - Tulane University\\RESEARCH\\Quantum transport\\Code\\Plots\\NewMeasures\\Eigenvalues.txt", "w");
+	for (i = 0; i < n; i++) {
+		fprintf(fh_eigen, "%lf\n", eval[i]);
+	}
+	fclose(fh_eigen);
+	
 
 	for (i = 0; i < n; i++) psi[i].r = psi[i].i = 0.;
 	for (i = 0; i < ns; i++) list1[i] = 1;

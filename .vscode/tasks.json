@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+        "label": "Build ExactDiagonalization",
+        "type": "shell",
+        "command": "C:/msys64/mingw64/bin/gcc.exe",
+        "args": [
+            "ExactDiagonalization.c",
+            "-o",
+            "ExactDiagonalization.exe",
+            "-g",
+            "-O0",
+            "-I",
+            "C:/msys64/mingw64/include",
+            "-L",
+            "C:/msys64/mingw64/lib",
+            "-lopenblas",
+            "-lgfortran",
+            "-lm"
+        ],
+        "options": {
+            "env": {
+                "PATH": "C:/msys64/mingw64/bin;${env:PATH}"
+            }
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": [
+            "$gcc"
+        ]
+    }
+]
+}
